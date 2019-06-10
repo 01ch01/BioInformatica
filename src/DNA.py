@@ -259,10 +259,11 @@ class DNA(object):
         """
 
         linhas = len(motif)
+        colunas = len(motif[0])
         motif_aleatorio = [[0] * k for i in range(linhas)]
 
+        ponto_partida_maximo = colunas - k
         for i in range(linhas):
-            ponto_partida_maximo = linhas - k
             inicio_random = randint(0, ponto_partida_maximo)
             trecho = motif[i][inicio_random:inicio_random + k]
             motif_aleatorio[i] = trecho
@@ -372,52 +373,19 @@ def randomized_motif_search(motif):
     return melhor_motif
 
 
-def gibbs_sampler(motif, linha, coluna, k):
-    """
-    É um trampo
-    :rtype: sei la
-    """
-
-    dna = DNA()
-    motif_original = dna.criar_motif(linha, coluna)
-    motif_random = DNA.criar_motif_de_trechos_aleatorios(motif_original, k)
-
-    # removendo linha e guardar ela posteriomente
-    index_linha_retirada = randint(0, len(motif_random))
-    kmer_retirado = motif_random[index_linha_retirada]
-    kmer_original_retirado = motif_original[index_linha_retirada]
-    del (motif_random, motif_random[index_linha_retirada])
-
-    # criando profile com o que sobrou da matriz
-    profile = DNA.profile_frequencia(motif_random)
-    profile = DNA.profile_probabilidade(profile)
-
-    lista_prob = []
-    numero_de_pulos = len(kmer_original_retirado) - k + 1
-
-    # iniciando fora do laço pra poder armazenar
-    trecho_maior_prob = []
-    maior_prob = 0.0
-    for i in range(numero_de_pulos):
-        trecho = kmer_original_retirado[i:i + k]
-        prob = DNA.calcular_probabilidade_trecho(trecho, profile)
-        lista_prob.append(prob)
-        if prob > max(lista_prob):
-            maior_prob = prob
-            trecho_maior_prob = trecho
-
-
 def gibbs(motif_original, k):
     removed_sequence = []
     iteracoes = len(motif_original)
 
     # criando/zerando matriz de resultados de uma vez
     resultado = [[''] * k for i in range(iteracoes)]
+    # resultado = [['']*iteracoes]
+    # resultado = []
 
     # fazer isso até o motif original não ter mais nada
-    for i in range(0, iteracoes):
+    for i in range(0, iteracoes-1):
         # add em um e remove no outro
-        linha_random = randint(0, len(motif_original))
+        linha_random = randint(0, len(motif_original)-1)
         removed_sequence.append(motif_original[linha_random])
         motif_original.remove(motif_original[linha_random])
 
@@ -487,10 +455,9 @@ def main():
         ['C', 'G', 'T', 'C', 'A', 'G', 'A', 'G', 'G', 'T']
     ]
 
-    # randomized_motif_search(motif_4)
-
-    novo_motif = DNA.remover_kmer_random(motif_5, true)
-    print(novo_motif)
+    resultado = gibbs(motif_4, 4)
+    for i in range(0, len(resultado)):
+        print(resultado[i])
 
 
 if __name__ == '__main__':
