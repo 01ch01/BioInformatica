@@ -6,7 +6,7 @@ class DNA(object):
     @staticmethod
     def criar_kmer_aleatorio(k):
         """
-        Retorna uma sequencia(kmer) aleatória de tamanho k
+        Retorna uma sequencia(k-mer) aleatória de tamanho k
         :param k: tamanho (length) do kmer desejado.
         :rtype: list()
         :return lista de sequencia aleatoria
@@ -33,7 +33,7 @@ class DNA(object):
     def calcular_erros(trecho, kmer, k):
         """
         Calcula a quantidade de erros (mutações) de um trecho em relação a
-        sequencia original de tamanho k
+        um k-mer de tamanho k
         :param trecho:
         :param kmer:
         :param k:
@@ -49,7 +49,7 @@ class DNA(object):
     def percorrer(self, kmer, trecho, k):
         """
         Slice and Switch
-        Percorre o kmer original
+        Percorre o k-mer original
         :rtype: int
         """
 
@@ -69,7 +69,7 @@ class DNA(object):
         distancia = min(self.percorrer(trecho, sequencia, k))
 
         print(f"Trecho aleatório: {''.join(trecho)}")
-        print(f"Kmer: {''.join(sequencia)}")
+        print(f"k-mer: {''.join(sequencia)}")
         print(f"A menor distância é {distancia}")
 
         return distancia
@@ -125,10 +125,10 @@ class DNA(object):
         return profile
 
     @staticmethod
-    def criar_sequencia_provavel(profile):
+    def criar_kmer_provavel(profile):
         """
-        A partir de determinado profile (matriz de frequencia), calcular a
-        sequencia mais provavel.
+        A partir de determinado profile (matriz de frequencia), calcular o
+        k-mer mais provavel.
         :return uma lista de motif contendo a sequencia mais provavel
         :rtype: list
         """
@@ -192,8 +192,7 @@ class DNA(object):
     def calcular_probabilidade_trecho(trecho, profile):
         """
         Dado um trecho de tamanho (len) igual a do profile, retorna a
-        probabilidade de sua ocorrencia
-        (com 4 casas decimais).
+        probabilidade de sua ocorrencia (com 4 casas decimais).
         :rtype: float
         """
 
@@ -269,6 +268,20 @@ class DNA(object):
             motif_aleatorio[i] = trecho
 
         return motif_aleatorio
+
+    @staticmethod
+    def laplace(profile):
+        """
+
+        :param profile:
+        """
+        linhas = len(profile)
+        colunas = len(profile[0])
+        for i in range(linhas):
+            for j in range(colunas):
+                profile[i][j] += 1
+
+        return profile
 
 
 def menores_distancias():
@@ -350,14 +363,14 @@ def randomized_motif_search(motif):
 
     qtd_linhas = len(motif)
     qtd_colunas = len(motif[0])
-    numero_de_pulos = qtd_colunas - k + 1
+    n_pulos = qtd_colunas - k + 1
     dict_resultados = {}
     melhor_trecho = ''
     melhor_motif = []
 
     for i in range(qtd_linhas):
         maior_prob = 0
-        for j in range(numero_de_pulos):
+        for j in range(n_pulos):
 
             trecho = motif[i][j:j + k]
             trecho = ''.join(trecho)
@@ -383,9 +396,9 @@ def gibbs(motif_original, k):
     # resultado = []
 
     # fazer isso até o motif original não ter mais nada
-    for i in range(0, iteracoes-1):
+    for i in range(0, iteracoes - 1):
         # add em um e remove no outro
-        linha_random = randint(0, len(motif_original)-1)
+        linha_random = randint(0, len(motif_original) - 1)
         removed_sequence.append(motif_original[linha_random])
         motif_original.remove(motif_original[linha_random])
 
@@ -394,10 +407,11 @@ def gibbs(motif_original, k):
 
         # criando profile com base no motif random
         profile = DNA.profile_frequencia(motif_random)
+        profile = DNA.laplace(profile)
         profile = DNA.profile_probabilidade(profile)
 
         # percorrendo a linha dos removidos e calculando a probabilidade para
-        # cada trecho dentro dessa linha kkk
+        # cada trecho dentro dessa linha
         numero_de_pulos = len(removed_sequence[i]) - k + 1
 
         trecho_maior_prob = []
