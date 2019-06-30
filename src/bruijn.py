@@ -46,11 +46,14 @@ def paired_composition(sequencia, k):
         # inserindo nó na lista de vértices
         lista_vertices.append(no.item)
 
-        # criando tupla de ligação do nó anterior com o nó atual
-        ligacao = (lista_vertices[i - 1], no.item)
+        if i == 0:
+            pass
+        else:
+            # criando tupla de ligação do nó anterior com o nó atual
+            ligacao = (lista_vertices[i - 1], no.item)
 
-        # inserindo tupla na lista de arestas
-        lista_arestas.append(ligacao)
+            # inserindo tupla na lista de arestas
+            lista_arestas.append(ligacao)
 
     return [lista_vertices, lista_arestas]
 
@@ -89,7 +92,10 @@ def main():
     lista_arestas = resultado[1]
 
     grafo = criar_grafo(lista_vertices, lista_arestas)
-    print(grafo)
+
+    print("\nAresta   Vértices\n")
+    for a, v in grafo.items():
+        print(f"{a} ->  {v}")
 
 
 if __name__ == '__main__':
